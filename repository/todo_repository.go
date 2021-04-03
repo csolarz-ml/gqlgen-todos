@@ -36,7 +36,11 @@ func New() TodoRepository {
 
 	options := options.Client().ApplyURI(MONGO_DB).SetMaxPoolSize(100)
 
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, er := context.WithTimeout(context.Background(), 30*time.Second)
+
+	if er != nil {
+		log.Fatal(er)
+	}
 
 	client, err := mongo.Connect(ctx, options)
 
