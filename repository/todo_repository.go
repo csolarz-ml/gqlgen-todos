@@ -2,8 +2,10 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/csolarz-ml/gqlgen-todos/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -34,7 +36,16 @@ func NewTodoRepository() TodoRepository {
 	}
 
 	clientOptions := options.Client().ApplyURI(MONGO_DB)
-	ctx := context.TODO()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+
+	defer cancel()
+	select {
+	case <-time.After(1 * time.Second):
+		fmt.Println("overslept")
+	case <-ctx.Done():
+		fmt.Println(ctx.Err()) // prints "context deadline exceeded"
+		log.Fatal(ctx.Err())
+	}
 
 	client, err := mongo.Connect(ctx, clientOptions)
 
