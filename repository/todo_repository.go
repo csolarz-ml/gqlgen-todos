@@ -7,6 +7,7 @@ import (
 
 	"github.com/csolarz-ml/gqlgen-todos/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -17,7 +18,7 @@ const (
 )
 
 type TodoRepository interface {
-	Save(todo *model.Todo)
+	Save(todo *model.Todo) *model.Todo
 	Find() []*model.Todo
 }
 
@@ -52,13 +53,17 @@ func NewTodoRepository() TodoRepository {
 	}
 }
 
-func (db *database) Save(todo *model.Todo) {
+func (db *database) Save(todo *model.Todo) *model.Todo {
 	collection := db.client.Database(DATABASE).Collection(COLLECTION)
-	_, err := collection.InsertOne(context.TODO(), todo)
+	res, err := collection.InsertOne(context.TODO(), todo)
 
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	todo.ID = res.InsertedID.(primitive.ObjectID).Hex()
+
+	return todo
 }
 
 func (db *database) Find() []*model.Todo {

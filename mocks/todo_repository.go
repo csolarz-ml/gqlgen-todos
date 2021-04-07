@@ -5,14 +5,16 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type TodoRepositoryMock struct {
+type MockTodoRepository struct {
 	mock.Mock
 }
 
-func (r *TodoRepositoryMock) Save(todo *model.Todo) {
+func (s *MockTodoRepository) Save(m *model.Todo) *model.Todo {
+	args := s.Called(m)
+	return args.Get(0).(*model.Todo)
 }
 
-func (r *TodoRepositoryMock) Find() []*model.Todo {
-	args := r.Called()
+func (s *MockTodoRepository) Find() []*model.Todo {
+	args := s.Called()
 	return args.Get(0).([]*model.Todo)
 }

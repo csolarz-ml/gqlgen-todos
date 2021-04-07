@@ -5,19 +5,13 @@ package graph
 
 import (
 	"context"
-	"math/rand"
-	"strconv"
-	"time"
 
 	"github.com/csolarz-ml/gqlgen-todos/graph/generated"
 	"github.com/csolarz-ml/gqlgen-todos/graph/model"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	rand.Seed(time.Now().UnixNano())
-
 	todo := &model.Todo{
-		ID:     strconv.Itoa(rand.Int()),
 		Text:   input.Text,
 		UserID: input.UserID,
 	}
