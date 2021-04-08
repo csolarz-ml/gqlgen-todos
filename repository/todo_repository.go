@@ -4,10 +4,10 @@ import (
 	"context"
 	"log"
 	"os"
-	"time"
 
 	"github.com/csolarz-ml/gqlgen-todos/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -18,7 +18,7 @@ const (
 )
 
 type TodoRepository interface {
-	Save(todo *model.Todo)
+	Save(todo *model.Todo) *model.Todo
 	Find() []*model.Todo
 }
 
@@ -26,7 +26,7 @@ type database struct {
 	client *mongo.Client
 }
 
-func New() TodoRepository {
+func NewTodoRepository() TodoRepository {
 
 	MONGO_DB := os.Getenv("MONGO_DB")
 
@@ -34,16 +34,16 @@ func New() TodoRepository {
 		MONGO_DB = "mongodb://localhost:27017/"
 	}
 
-	options := options.Client().ApplyURI(MONGO_DB).SetMaxPoolSize(100)
+	clientOptions := options.Client().ApplyURI(MONGO_DB)
+	ctx := context.TODO()
 
-	ctx, er := context.WithTimeout(context.Background(), 30*time.Second)
+	client, err := mongo.Connect(ctx, clientOptions)
 
-	if er != nil {
-		log.Fatal(er)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	client, err := mongo.Connect(ctx, options)
-
+	err = client.Ping(ctx, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,13 +53,17 @@ func New() TodoRepository {
 	}
 }
 
-func (db *database) Save(todo *model.Todo) {
+func (db *database) Save(todo *model.Todo) *model.Todo {
 	collection := db.client.Database(DATABASE).Collection(COLLECTION)
-	_, err := collection.InsertOne(context.TODO(), todo)
+	res, err := collection.InsertOne(context.TODO(), todo)
 
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	todo.ID = res.InsertedID.(primitive.ObjectID).Hex()
+
+	return todo
 }
 
 func (db *database) Find() []*model.Todo {

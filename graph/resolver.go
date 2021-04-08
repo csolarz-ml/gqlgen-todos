@@ -1,6 +1,6 @@
 package graph
 
-import "github.com/csolarz-ml/gqlgen-todos/graph/model"
+import "github.com/csolarz-ml/gqlgen-todos/repository"
 
 // This file will not be regenerated automatically.
 //
@@ -8,5 +8,5 @@ import "github.com/csolarz-ml/gqlgen-todos/graph/model"
 
 //go:generate go run github.com/99designs/gqlgen
 type Resolver struct {
-	todos []*model.Todo
+	TodoRepository repository.TodoRepository
 }

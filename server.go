@@ -9,6 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/csolarz-ml/gqlgen-todos/graph"
 	"github.com/csolarz-ml/gqlgen-todos/graph/generated"
+	"github.com/csolarz-ml/gqlgen-todos/repository"
 )
 
 const defaultPort = "8080"
@@ -19,7 +20,10 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	todoRepository := repository.NewTodoRepository()
+	resolvers := graph.Resolver{TodoRepository: todoRepository}
+
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
