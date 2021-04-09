@@ -1,0 +1,36 @@
+version: '3.3'
+
+services: 
+    mongo:
+        image: mongo:latest
+        ports: 
+            - "27017:27017"
+        networks: 
+            - my-network 
+    api:
+        build: "."
+        depends_on: 
+            - mongo
+        ports:
+            - "8080"
+        environment:
+            MONGO_DB: "mongodb://mongo"
+            PORT: 8080
+        restart: "always"
+        networks: 
+            - my-network
+    nginx:
+        image: nginx:latest
+        volumes:
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        depends_on: 
+            - api
+        ports: 
+            - "80:80"
+        networks: 
+            - my-network
+
+#Docker Networks
+networks: 
+    my-network:
+        driver: bridge
