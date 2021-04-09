@@ -18,3 +18,4 @@ __debug_bin
 sonar-project.properties
 .scannerwork/
 *.bak
+gqlgen-todos
