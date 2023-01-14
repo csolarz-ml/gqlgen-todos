@@ -1,5 +1,16 @@
 # gqlgen-todos
 
+gqlgen-todos is a pet project, to create a to-do list and save records in mongodb. 
+
+uses
+
+- docker compose to create 
+  - reverse proxy 
+  - graphql server
+  - mongodb   
+- sonarqube to run static analysis
+- github actions to run tests in race mode. 
+
 ## GraphQL server in golang
 
 ### Steps: 
